@@ -15,14 +15,16 @@
 </head>
 <body>
 <%
-		if(id != null){
+		if(id != "" && pw != ""){
 %>
 <h1>로그아웃 페이지</h1>
 <%=id %>
 <%
 		} else {
 %>
-			<%	response.sendRedirect("05.login.jsp");%>
+			<%
+			session.invalidate();
+			response.sendRedirect("05.login.jsp");%>
 <%
 			application.log("로그아웃 페이지 라우팅");
 		}
