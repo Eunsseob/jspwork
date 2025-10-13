@@ -55,4 +55,25 @@ public class MemberDao {
 		}
 		return flag;
 	}
+	
+	// login
+	public boolean loginMember(String id, String pwd) {
+		boolean flag = false;
+		
+		try {
+			con = pool.getConnection();
+			sql = "select id from member where id=? and pwd=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id); // 프롬프트 순서대로 값들어가는것을 지정해준다.
+			pstmt.setString(2, pwd);
+			
+			rs = pstmt.executeQuery();
+			flag = rs.next();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return flag;
+	}
 }

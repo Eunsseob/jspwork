@@ -7,6 +7,35 @@
 <title>Insert title here</title>
 </head>
 <body>
-	회원가입 성공!!
+<%
+	String id = (String)session.getAttribute("idKey");
+	if(id != null) {
+%>
+		<b><%=id %>님 환영합니다.</b><p/>
+		즐거운 쇼핑되세요.<p/>
+		<a href="logout.jsp">로그아웃하기</a>
+<%
+	} else {
+%>
+	<form action="LoginProc.jsp" method="post">
+		<table align="center">
+			<tr>
+				<th colspan="2">로그인</th>
+			</tr>
+			<tr>
+				<td>ID</td>
+				<td><input name="id" required></td>
+			</tr>
+			<tr>
+				<td>PW</td>
+				<td><input type="password" name="pwd" required></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">
+					<input type="submit" value="로그인하기">&ensp;
+					<input type="button" value="회원가입" onclick="location.href='member.jsp'">
+		</table>
+	</form>
+<% } %>
 </body>
 </html>
