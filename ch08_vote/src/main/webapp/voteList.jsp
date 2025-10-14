@@ -25,8 +25,8 @@
 		
 		<h5 class="m30">설문폼</h5>
 		<hr>
-		<h1><%=vDao.getMaxNum()%></h1>
-			
+		<jsp:include page="voteForm.jsp" /> 
+			<!-- // 받아올때 이게 더 편함 -->
 		
 		<h5 class="m30">설문리스트</h5>
 		<table class="table m30">
@@ -45,7 +45,9 @@
 				String edate = vlist.getEdate().substring(0,10);
 				
 				out.print("<tr><td class='cen'>" + (alist.size()-i) + "</td>");
-				out.print("	   <td>" + question + "</td>");
+				out.print("	   <td><a href='voteList.jsp?num=" 
+							+ num + "'>" 
+							+ question + "</a></td>");
 				out.print("	   <td class='cen'>" + sdate + " ~ " + edate + "</td></tr>");
 			}
 			%>
