@@ -107,4 +107,9 @@ public class Boardlist {
 				+ ", ref=" + ref + ", depth=" + depth + ", regdate=" + regdate + ", pass=" + pass + ", ip=" + ip
 				+ ", count=" + count + "]";
 	}
+
+	public void updateBoard(Boardlist upBean) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -11,17 +11,43 @@ public class BoardDao {
 	ResultSet rs;
 	String sql;
 	
+	// total 레코드 수
+	public int getTotalRecord(String keyField, String keyWord) {
+		int totalRecord = 0;	
+		try {
+			con = pool.getConnection();
+			if(keyWord.equals("") || keyWord == null) {
+				sql = "select count(num) from board";
+				pstmt = con.prepareStatement(sql);
+			} else {
+				sql = "select count(num) from board where " + keyField + " like ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, "%" + keyWord + "%");
+				
+			}
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				totalRecord = rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+		return totalRecord;
+	}
+	
 	// 게시판 목록 가져오기
-	public ArrayList<Boardlist> getBoardList(String keyField, String keyWord) {
+	public ArrayList<Boardlist> getBoardList(String keyField, String keyWord, int start, int end) {
 		ArrayList<Boardlist> alist = new ArrayList<>();	
 		try {
 			con = pool.getConnection();
 			if(keyWord.equals("") || keyWord==null) {
-				sql = "select * from board order by num asc";	
+				sql = "select * from (select ROWNUM as RNUM, BT1.* from (select * from board order by ref desc, pos) BT1) where RNUM between ? and ?";
 			} else {
-				sql = "select * from board where " + keyField + " like '%" + keyWord + "%' order by num asc";
+				sql = "select * from (select ROWNUM as RNUM, BT1.* from (select * from board order by ref desc, pos) BT1 where " + keyField + "like ?)";
 			}
-			rs = con.createStatement().executeQuery(sql);
+			//rs = con.setement(sql);
 			while(rs.next()) {
 				Boardlist bean = new Boardlist();
 				bean.setNum(rs.getInt("num"));
@@ -42,7 +68,89 @@ public class BoardDao {
 		return alist;
 	}
 	
+	// 조회수 증가
+	public void upCount(int num) {
+		try {
+			con = pool.getConnection();
+			sql = "update board set count = count+1 where num=" + num;
+			con.createStatement().executeUpdate(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+	}
+	
+	// num에 해당하는 게시물 얻어오기
+	public Boardlist getBoard(int num) {
+		Boardlist bean = new Boardlist();
+		try {
+			con = pool.getConnection();
+			sql = "select * from board where num="+num;
+			rs = con.createStatement().executeQuery(sql);
+			if(rs.next()) {
+				bean.setNum(rs.getInt("num"));
+				bean.setName(rs.getString("name"));
+				bean.setSubject(rs.getString("subject"));
+				bean.setContent(rs.getString("content"));
+				bean.setPos(rs.getInt("pos"));
+				bean.setRef(rs.getInt("ref"));
+				bean.setDepth(rs.getInt("depth"));
+				bean.setRegdate(rs.getString("regdate"));
+				bean.setPass(rs.getString("pass"));
+				bean.setIp(rs.getString("ip"));
+				bean.setCount(rs.getInt("count"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+		return bean;
+	}
+	
+	// 게시물 수정
+	public void updateBoard(Boardlist bean) {
+		try {
+			con = pool.getConnection();
+			sql = "update board set name=?, subject=?, content=? where num=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getName());
+			pstmt.setString(2, bean.getSubject());
+			pstmt.setString(3, bean.getContent());
+			pstmt.setInt(4, bean.getNum());
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+	}
+	
+	// 게시글쓰기
+	public int insertBoard(Boardlist board) {
+		int result = 0;
+		try {
+			con = pool.getConnection();
+			sql = "insert into board values(SEQ_BOARD.NEXTVAL,?,?,?,0,SEQ_BOARD.CURRVAL,0,SYSDATE,?,?,default)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, board.getName());
+			pstmt.setString(2, board.getSubject());
+			pstmt.setString(3, board.getContent());
+			pstmt.setString(4, board.getPass());
+			pstmt.setString(5, board.getIp());
+			result = pstmt.executeUpdate();				
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+		return result;
+	}
+	
 	// 
+	
+
 	public ArrayList<Boardlist> getList2() {
 		ArrayList<Boardlist> alist = new ArrayList<>();	
 		try {
@@ -59,4 +167,7 @@ public class BoardDao {
 		}
 		return alist;
 	}
+
+
+	
 }

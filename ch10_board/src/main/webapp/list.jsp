@@ -3,13 +3,51 @@
 <%@ page import="java.util.*, board.*" %>
 <jsp:useBean id="bDao" class="board.BoardDao" />
 <%
+
+	int totalRecord = 0;
+	int numPerPage = 10;
+	int pagePerBlock = 5;
+	
+	int totalPage = 0;
+	int totalBlock = 0;
+	
+	int nowPage = 1;
+	int nowBlock = 1;
+	
+	int start = 0;
+	int end = 0;
+	int listSize = 0;
+
 	String keyField= "", keyWord = "";
 	if(request.getParameter("keyWord") != null) {
 		keyField = request.getParameter("keyField");
 		keyWord = request.getParameter("keyWord");	
 	}
-	ArrayList<Boardlist> alist = bDao.getBoardList(keyField, keyWord);
+
+	
+	totalRecord = bDao.getTotalRecord(keyField, keyWord);
+	totalPage = (int)Math.ceil(totalRecord / (double)numPerPage);
+	totalBlock = (int)Math.ceil(totalRecord / (double)pagePerBlock);
+	nowBlock = (int)Math.ceil(nowPage / (double)pagePerBlock); 
+	start = nowPage * numPerPage - numPerPage + 1;
+	end = nowPage * numPerPage;
+	
+	if(request.getParameter("reload") != null) {
+		if(request.getParameter("reload").equals("true")) {
+			keyField = "";
+			keyWord = "";
+		}
+	}
 %>
+<script type="text/javascript">
+	function list(){
+		document.listFrm.submit();
+	}
+	function read(num) {
+		document.readFrm.num.value = num;
+		document.readFrm.submit();
+	}
+</script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,7 +62,7 @@
 		<h2 class="m30">JSPBoard</h2>
 		<table class="table m30">
 			<tr>
-				<td colspan=5 class="right-align">Total : </td>
+				<td colspan=5 class="right-align">Total : <%=totalRecord %>Articles(<%=nowPage %>/<%=totalPage %>Pages)</td>
 			</tr>
 			<tr>
 				<th width="12%">번호</th>
@@ -34,12 +72,14 @@
 				<th width="12%">조회수</th>
 			</tr>
 			<%
+			ArrayList<Boardlist> alist = bDao.getBoardList(keyField, keyWord, start, end);
+			
 			for(int i=0; i<alist.size(); i++) {
 				Boardlist board = alist.get(i);
 			%>
 				<tr>
 					<td class="cen"><%=board.getNum() %></td>
-					<td><%=board.getSubject() %></td>
+					<td><a href="javascript:read('<%=board.getNum() %>')"><%=board.getSubject() %></a></td>
 					<td class="cen"><%=board.getName() %></td>
 					<td class="cen"><%=board.getRegdate().substring(0,10) %></td>
 					<td class="cen"><%=board.getCount() %></td>
@@ -51,8 +91,8 @@
 			<tr>
 				<td colspan=3 class="cen">[1]</td>
 				<td colspan=2 class="right-align">
-					<a href = "">[글쓰기]</a>&emsp;
-					<a href = "">[처음으로]</a>&emsp;
+					<a href = "post.jsp">[글쓰기]</a>&emsp;
+					<a href = "javascript:list();">[처음으로]</a>&emsp;
 				</td>
 			</tr>
 		</table>
@@ -66,6 +106,19 @@
 			<input type="submit" value="찾기">
 		</form>
 		
+		<!-- 처음으로 누르면 화면 reload -->
+		<form name = "listFrm">
+			<input type="hidden" name="reload" value="true">
+			<input type="hidden" name="nowPage" value="1">
+		</form>
+		
+		<!--  제목을 누르면 상세보기 페이지로 가기 -->
+		<form name="readFrm" action="read.jsp">
+			<input type="hidden" name="num">
+			<input type="hidden" name="nowPage" value="<%=nowPage %>">
+			<input type="hidden" name="keyField" value="<%=keyField %>">
+			<input type="hidden" name="keyWord" value="<%=keyWord %>">
+		</form>
 	</div>
 </body>
 </html>
