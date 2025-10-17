@@ -3,13 +3,13 @@
 <%@ page import = "board.*" %>
 <jsp:useBean id="bDao" class="board.BoardDao" />
 <%
-	int num = Integer.parseInt(request.getParameter("num"));
+int num = Integer.parseInt(request.getParameter("num"));
 	int nowPage = Integer.parseInt(request.getParameter("nowPage"));
 	String keyField = request.getParameter("keyField");
 	String keyWord = request.getParameter("keyWord");
 	
-	Boardlist board = null;
-	Boardlist sessionBoard = (Boardlist)session.getAttribute("bean");
+	Board board = null;
+	Board sessionBoard = (Board)session.getAttribute("bean");
 	
 	if(sessionBoard == null || sessionBoard.getNum() != num) {
 		bDao.upCount(num);
