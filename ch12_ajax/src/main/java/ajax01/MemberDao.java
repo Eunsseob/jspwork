@@ -3,6 +3,7 @@ package ajax01;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 public class MemberDao {
 	private DBConnectionMgr pool = DBConnectionMgr.getInstance();
@@ -10,10 +11,10 @@ public class MemberDao {
 	PreparedStatement pstmt;
 	ResultSet rs;
 	String sql;
-	
+
 	public boolean checkId(String id) {
 		boolean flag = false;
-		
+
 		try {
 			con = pool.getConnection();
 			sql = "select id from member where id = ?";
@@ -27,7 +28,7 @@ public class MemberDao {
 		}
 		return flag;
 	}
-	
+
 	public boolean insertMember(Member bean) {
 		boolean flag = false;
 		try {
@@ -45,8 +46,8 @@ public class MemberDao {
 			pstmt.setString(9, bean.getDetail_address());
 			pstmt.setString(10, String.join(" ", bean.getHobby()));
 			pstmt.setString(11, bean.getJob());
-			
-			if(pstmt.executeUpdate() == 1)
+
+			if (pstmt.executeUpdate() == 1)
 				flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,25 +56,75 @@ public class MemberDao {
 		}
 		return flag;
 	}
-	
+
 	// login
 	public boolean loginMember(String id, String pwd) {
 		boolean flag = false;
-		
+
 		try {
 			con = pool.getConnection();
 			sql = "select id from member where id=? and pwd=?";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, id); // 프롬프트 순서대로 값들어가는것을 지정해준다.
 			pstmt.setString(2, pwd);
-			
+
 			rs = pstmt.executeQuery();
 			flag = rs.next();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		return flag;
+	}
+
+	// ID 조회해서 받아오는 방법!! (id, 이름, 젠더, 이메일) 가져오기
+	public Member getMember(String id) {
+		Member mem = new Member();
+		try {
+			con = pool.getConnection();
+			sql = "select id, name, gender, email from member where id = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				mem.setId(rs.getString("id"));
+				mem.setName(rs.getString("name"));
+				mem.setGender(rs.getString("gender"));
+				mem.setEmail(rs.getString("email"));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+		return mem;
+	}
+
+	// 전체 회원 검색
+	public ArrayList<Member> getAllMember() {
+		ArrayList<Member> alist = new ArrayList<>();
+
+		try {
+			con = pool.getConnection();
+			sql = "select * from member";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Member bean = new Member();
+				bean.setId(rs.getString("id"));
+				bean.setName(rs.getString("name"));
+				bean.setGender(rs.getString("gender"));
+				bean.setEmail(rs.getString("email"));
+				alist.add(bean);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con);
+		}
+		return alist;
+
 	}
 }

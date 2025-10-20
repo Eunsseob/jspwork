@@ -72,10 +72,10 @@
 				<th width="12%">조회수</th>
 			</tr>
 			<%
-			ArrayList<Board> alist = bDao.getBoardList(keyField, keyWord, start, end);
+			ArrayList<Boardlist> alist = bDao.getBoardList(keyField, keyWord, start, end);
 				
 				for(int i=0; i<alist.size(); i++) {
-					Board board = alist.get(i);
+					Boardlist board = alist.get(i);
 			%>
 				<tr>
 					<td class="cen"><%=board.getNum() %></td>
