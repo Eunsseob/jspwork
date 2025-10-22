@@ -34,5 +34,25 @@
 	currencySymbol $ : <fmt:formatNumber value="${num3}" type="currency" currencySymbol="$"/><br>
 	currencySymbol ¥ : <fmt:formatNumber value="${num3}" type="currency" currencySymbol="¥"/><br>
 	
+	<hr>
+	
+	<h3>2. formatDate</h3>
+	<p>날짜 및 시간 데이터의 포맷지정(단, java.util.Date 객체 사용)</p>
+	
+	<c:set var="current" value="<%=new java.util.Date() %>"/>
+	출력 : ${current} <br>
+	
+	<ul>
+		<li>현재 날짜 : <fmt:formatDate value="${current }" /></li><!--  type 생략 가능 -->
+		<li>현재 시간 : <fmt:formatDate value="${current }" type="time" /></li><!--  type 생략 가능 -->
+		<li>현재 날짜와 시간 : <fmt:formatDate value="${current }" type="both"/></li>
+		<li> Medium 은 기본값
+		<li>Medium : <fmt:formatDate value="${current }" type="both" dateStyle="medium" timeStyle="medium"/></li>
+		<li>Long : <fmt:formatDate value="${current }" type="both" dateStyle="Long" timeStyle="Long"/></li>
+		<li>Full : <fmt:formatDate value="${current }" type="both" dateStyle="Full" timeStyle="Full"/></li>
+		<li>Short : <fmt:formatDate value="${current }" type="both" dateStyle="Short" timeStyle="Short"/></li>
+		<li>내 패턴 : <fmt:formatDate value="${current }" type="both" pattern="yyyy-MM-dd(E) hh:mm:ss(a)"/></li>
+	</ul>
 </body>
 </html>
+
